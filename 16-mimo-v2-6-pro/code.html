@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tools Don't Need Souls — An Essay on the Purpose of AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f2ece1;
+    --paper-deep:#e8e0d1;
+    --ink:#171310;
+    --ink-soft:#4a423a;
+    --ink-faint:#8b8073;
+    --vermillion:#c1400e;
+    --ochre:#b9832b;
+    --moss:#3d5240;
+    --rule:rgba(23,19,16,.16);
+    --measure:66ch;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;}
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Newsreader",Georgia,serif;
+    font-size:19px;
+    line-height:1.62;
+    font-optical-sizing:auto;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* ---- paper grain ---- */
+  body::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:9999;
+    opacity:.16;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+
+  ::selection{background:var(--vermillion);color:var(--paper);}
+
+  /* ---- shell ---- */
+  .shell{
+    max-width:1280px;
+    margin:0 auto;
+    padding:0 clamp(1.25rem,4vw,3.5rem);
+    position:relative;
+  }
+
+  /* ---- type helpers ---- */
+  .mono{
+    font-family:"DM Mono",monospace;
+    font-size:.66rem;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    font-weight:400;
+  }
+
+  .display{
+    font-family:"Fraunces",Georgia,serif;
+    font-weight:340;
+    line-height:.92;
+    letter-spacing:-.028em;
+    font-variation-settings:"SOFT" 18,"WONK" 1;
+  }
+
+  em, .it{font-style:italic;}
+
+  /* ================= MASTHEAD ================= */
+  .masthead{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:1.5rem;
+    padding:1.6rem 0 1.15rem;
+    border-bottom:1px solid var(--ink);
+    flex-wrap:wrap;
+  }
+  .masthead .mono{color:var(--ink-soft);}
+  .masthead .rule-dots{
+    flex:1;
+    height:1px;
+    min-width:40px;
+    background-image:radial-gradient(circle, var(--rule) 1px, transparent 1px);
+    background-size:7px 1px;
+  }
+
+  /* ================= HERO ================= */
+  .hero{
+    padding:clamp(3.5rem,9vw,7.5rem) 0 clamp(2.5rem,5vw,4rem);
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,.42fr);
+    gap:clamp(2rem,5vw,4.5rem);
+    align-items:end;
+    border-bottom:1px solid var(--rule);
+  }
+
+  .kicker{
+    color:var(--vermillion);
+    display:block;
+    margin-bottom:2.2rem;
+    position:relative;
+    padding-left:3.2rem;
+  }
+  .kicker::before{
+    content:'';
+    position:absolute;
+    left:0;top:.55em;
+    width:2.3rem;height:1px;
+    background:var(--vermillion);
+  }
+
+  h1.hero-title{
+    font-family:"Fraunces",Georgia,serif;
+    font-weight:300;
+    font-size:clamp(3.1rem,10.2vw,9.2rem);
+    line-height:.86;
+    letter-spacing:-.045em;
+    font-variation-settings:"SOFT" 24,"WONK" 1;
+  }
+  h1.hero-title .accent{
+    color:var(--vermillion);
+    font-style:italic;
+    font-weight:340;
+    font-variation-settings:"SOFT" 40,"WONK" 1;
+  }
+  h1.hero-title .thin{
+    display:block;
+    font-size:.36em;
+    letter-spacing:-.012em;
+    line-height:1.15;
+    color:var(--ink-soft);
+    margin-top:1.15rem;
+    font-weight:300;
+    max-width:22ch;
+  }
+
+  .hero-aside{
+    padding-bottom:.75rem;
+    border-left:1px solid var(--rule);
+    padding-left:clamp(1.15rem,2.2vw,1.9rem);
+  }
+  .hero-aside p{
+    font-size:.98rem;
+    line-height:1.68;
+    color:var(--ink-soft);
+    margin-bottom:1.15rem;
+  }
+  .hero-aside .drop{
+    font-family:"Fraunces",serif;
+    font-size:2.65rem;
+    float:left;
+    line-height:.82;
+    padding:.18em .13em 0 0;
+    color:var(--vermillion);
+    font-weight:380;
+    font-variation-settings:"SOFT" 30,"WONK" 1;
+  }
+  .hero-aside .sig{
+    margin-top:1.6rem;
+    padding-top:1.15rem;
+    border-top:1px solid var(--rule);
+    color:var(--ink-faint);
+  }
+
+  /* ================= TICKER ================= */
+  .ticker{
+    border-bottom:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    overflow:hidden;
+    padding:.72rem 0;
+  }
+  .ticker-track{
+    display:flex;
+    gap:2.6rem;
+    width:max-content;
+    animation:slide 34s linear infinite;
+    white-space:nowrap;
+  }
+  .ticker-track span{
+    font-family:"DM Mono",monospace;
+    font-size:.68rem;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:2.6rem;
+  }
+  .ticker-track span::after{
+    content:'';
+    width:5px;height:5px;
+    background:var(--vermillion);
+    border-radius:50%;
+    display:inline-block;
+  }
+  @keyframes slide{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ================= ESSAY BODY ================= */
+  .essay{
+    display:grid;
+    grid-template-columns:clamp(90px,10vw,140px) minmax(0,1fr) clamp(80px,11vw,190px);
+    gap:clamp(1.25rem,3.2vw,3rem);
+    padding:clamp(3.25rem,7vw,6rem) 0 0;
+  }
+  .marginalia{
+    position:relative;
+  }
+  .marginalia .sticky{
+    position:sticky;
+    top:2.25rem;
+    text-align:right;
+    padding-right:.75rem;
+    border-right:1px solid var(--rule);
+  }
+  .marginalia .num{
+    font-family:"Fraunces",serif;
+    font-size:clamp(2.4rem,4vw,3.6rem);
+    font-weight:300;
+    color:var(--vermillion);
+    display:block;
+    line-height:.9;
+    font-variation-settings:"SOFT" 20,"WONK" 1;
+  }
+  .marginalia .lbl{
+    display:block;
+    margin-top:.65rem;
+    color:var(--ink-faint);
+    font-family:"DM Mono",monospace;
+    font-size:.6rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    line-height:1.5;
+    word-break:break-word;
+  }
+
+  .col-main{max-width:var(--measure);}
+
+  .col-side{
+    font-family:"DM Mono",monospace;
+    font-size:.66rem;
+    line-height:1.85;
+    letter-spacing:.04em;
+    color:var(--ink-faint);
+  }
+  .col-side .note{
+    border-top:1px solid var(--rule);
+    padding-top:.85rem;
+    margin-bottom:1.6rem;
+  }
+  .col-side .note b{
+    display:block;
+    color:var(--vermillion);
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    font-weight:500;
+    margin-bottom:.35rem;
+    font-size:.6rem;
+  }
+
+  h2.sec-title{
+    font-family:"Fraunces",Georgia,serif;
+    font-weight:320;
+    font-size:clamp(1.95rem,4.4vw,3.35rem);
+    line-height:1.02;
+    letter-spacing:-.032em;
+    margin-bottom:1.75rem;
+    font-variation-settings:"SOFT" 22,"WONK" 1;
+    max-width:17ch;
+  }
+  h2.sec-title .accent{color:var(--vermillion);font-style:italic;}
+
+  .col-main p{
+    margin-bottom:1.55rem;
+    color:var(--ink-soft);
+  }
+  .col-main p strong{color:var(--ink);font-weight:600;}
+
+  .lede{
+    font-size:1.22rem;
+    line-height:1.56;
+    color:var(--ink)!important;
+    font-weight:400;
+    letter-spacing:-.012em;
+  }
+
+  .dropcap::first-letter{
+    font-family:"Fraunces",serif;
+    float:left;
+    font-size:4.15rem;
+    line-height:.76;
+    padding:.08em .11em 0 0;
+    color:var(--vermillion);
+    font-weight:360;
+    font-variation-settings:"SOFT" 30,"WONK" 1;
+  }
+
+  .section{padding-bottom:clamp(3rem,6vw,5.25rem);}
+  .section + .section{
+    border-top:1px solid var(--rule);
+    padding-top:clamp(3rem,6vw,5.25rem);
+  }
+
+  /* ---- ledger table ---- */
+  .ledger{
+    margin:2.5rem 0 2.25rem;
+    border-top:1.5px solid var(--ink);
+  }
+  .ledger-row{
+    display:grid;
+    grid-template-columns:minmax(0,1.5fr) minmax(0,.85fr) minmax(0,1fr);
+    gap:1rem;
+    padding:.95rem .25rem;
+    border-bottom:1px solid var(--rule);
+    align-items:baseline;
+    transition:background .35s ease, padding-left .35s ease;
+  }
+  .ledger-row:hover{background:rgba(193,64,14,.055);padding-left:.85rem;}
+  .ledger-row.head{
+    border-bottom:1px solid var(--ink);
+    color:var(--ink-faint);
+  }
+  .ledger-row .obj{
+    font-family:"Fraunces",serif;
+    font-size:1.22rem;
+    font-weight:380;
+    letter-spacing:-.015em;
+  }
+  .ledger-row .ans{
+    font-family:"DM Mono",monospace;
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+  }
+  .ans.no{color:var(--ink-faint);}
+  .ans.maybe{color:var(--ochre);}
+  .ans.yes{color:var(--moss);font-weight:500;}
+  .ledger-note{
+    font-family:"DM Mono",monospace;
+    font-size:.66rem;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-top:.95rem;
+    display:block;
+  }
+
+  /* ---- pull quote ---- */
+  .pullquote{
+    background:var(--ink);
+    color:var(--paper);
+    margin:clamp(2.5rem,5vw,3.75rem) 0;
+    padding:clamp(2.5rem,5.5vw,4.25rem) clamp(1.75rem,5vw,4.25rem);
+    position:relative;
+    overflow:hidden;
+  }
+  .pullquote::after{
+    content:'“';
+    position:absolute;
+    top:-2.4rem;right:.5rem;
+    font-family:"Fraunces",serif;
+    font-size:17rem;
+    line-height:1;
+    color:rgba(242,236,225,.075);
+    font-weight:300;
+  }
+  .pullquote blockquote{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:clamp(1.75rem,4.2vw,3.15rem);
+    line-height:1.12;
+    letter-spacing:-.028em;
+    font-weight:300;
+    max-width:19ch;
+    font-variation-settings:"SOFT" 26,"WONK" 1;
+  }
+  .pullquote blockquote em{color:var(--vermillion);}
+  .pullquote cite{
+    display:block;
+    margin-top:1.85rem;
+    font-family:"DM Mono",monospace;
+    font-size:.66rem;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    font-style:normal;
+    color:rgba(242,236,225,.5);
+  }
+
+  /* ---- five purposes ---- */
+  .purposes{
+    margin-top:2.75rem;
+    display:flex;
+    flex-direction:column;
+  }
+  .purpose{
+    display:grid;
+    grid-template-columns:clamp(3.4rem,6vw,5.4rem) minmax(0,1fr) minmax(0,1.15fr);
+    gap:clamp(1rem,2.6vw,2.15rem);
+    padding:1.85rem 0;
+    border-top:1px solid var(--rule);
+    align-items:start;
+    transition:background .4s ease, padding .4s ease;
+  }
+  .purpose:last-child{border-bottom:1px solid var(--rule);}
+  .purpose:hover{background:rgba(193,64,14,.05);}
+  .purpose .idx{
+    font-family:"Fraunces",serif;
+    font-size:clamp(1.95rem,3.4vw,2.85rem);
+    font-weight:300;
+    line-height:.85;
+    color:var(--vermillion);
+    font-variation-settings:"SOFT" 18,"WONK" 1;
+    transition:transform .45s cubic-bezier(.2,.8,.25,1);
+  }
+  .purpose:hover .idx{transform:translateY(-4px) rotate(-5deg);}
+  .purpose h3{
+    font-family:"Fraunces",serif;
+    font-size:clamp(1.28rem,2.5vw,1.72rem);
+    font-weight:390;
+    line-height:1.13;
+    letter-spacing:-.022em;
+    font-variation-settings:"SOFT" 16,"WONK" 1;
+  }
+  .purpose p{
+    font-size:.955rem;
+    line-height:1.66;
+    color:var(--ink-soft);
+  }
+
+  /* ---- closing question ---- */
+  .closing{
+    background:var(--paper-deep);
+    border-top:1px solid var(--ink);
+    border-bottom:1px solid var(--ink);
+    padding:clamp(4rem,10vw,8.5rem) 0;
+    margin-top:clamp(2.5rem,5vw,4rem);
+    position:relative;
+  }
+  .closing .shell{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,.85fr);
+    gap:clamp(2rem,5vw,4.5rem);
+    align-items:center;
+  }
+  .closing .q{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:clamp(2.15rem,5.6vw,4.65rem);
+    line-height:.98;
+    letter-spacing:-.038em;
+    font-weight:300;
+    font-variation-settings:"SOFT" 28,"WONK" 1;
+  }
+  .closing .q .accent{color:var(--vermillion);font-style:italic;}
+  .closing .answer{
+    font-size:1.02rem;
+    line-height:1.72;
+    color:var(--ink-soft);
+    border-left:1.5px solid var(--vermillion);
+    padding-left:clamp(1.15rem,2.4vw,1.85rem);
+  }
+  .closing .answer p{margin-bottom:1.15rem;}
+  .closing .answer p:last-child{margin-bottom:0;color:var(--ink);font-weight:500;}
+
+  /* ---- footer ---- */
+  footer{
+    padding:clamp(2.75rem,5vw,4.25rem) 0 3.25rem;
+  }
+  footer .shell{
+    display:flex;
+    justify-content:space-between;
+    gap:1.75rem;
+    flex-wrap:wrap;
+    align-items:flex-end;
+  }
+  footer .mono{color:var(--ink-faint);line-height:2;}
+  footer .brand{
+    font-family:"Fraunces",serif;
+    font-size:1.42rem;
+    font-weight:360;
+    letter-spacing:-.022em;
+    font-variation-settings:"SOFT" 22,"WONK" 1;
+  }
+  footer .brand .accent{color:var(--vermillion);font-style:italic;}
+
+  /* ---- reveal motion ---- */
+  .rv{opacity:0;transform:translateY(26px);transition:opacity .85s cubic-bezier(.2,.7,.25,1), transform .85s cubic-bezier(.2,.7,.25,1);}
+  .rv.in{opacity:1;transform:translateY(0);}
+  .rv.d1{transition-delay:.09s;}
+  .rv.d2{transition-delay:.18s;}
+  .rv.d3{transition-delay:.27s;}
+  .rv.d4{transition-delay:.36s;}
+
+  /* ================= RESPONSIVE ================= */
+  @media(max-width:940px){
+    .hero{grid-template-columns:1fr;align-items:start;gap:2.5rem;}
+    .hero-aside{border-left:none;border-top:1px solid var(--rule);padding-left:0;padding-top:1.75rem;}
+    .essay{grid-template-columns:minmax(0,1fr);}
+    .marginalia .sticky{
+      position:static;
+      text-align:left;
+      border-right:none;
+      border-bottom:1px solid var(--rule);
+      padding:0 0 .95rem;
+      margin-bottom:1.75rem;
+      display:flex;
+      align-items:baseline;
+      gap:1.15rem;
+    }
+    .marginalia .num{font-size:2.15rem;}
+    .marginalia .lbl{margin-top:0;word-break:normal;}
+    .col-side{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+      gap:1.35rem;
+      margin-top:2.5rem;
+      padding-top:1.85rem;
+      border-top:1px solid var(--rule);
+    }
+    .col-side .note{margin-bottom:0;}
+    .closing .shell{grid-template-columns:1fr;}
+    .purpose{grid-template-columns:clamp(2.9rem,10vw,3.9rem) minmax(0,1fr);}
+    .purpose p{grid-column:2;}
+    .ledger-row{grid-template-columns:minmax(0,1.35fr) minmax(0,.8fr) minmax(0,.95fr);gap:.65rem;}
+  }
+
+  @media(max-width:560px){
+    body{font-size:18px;}
+    .masthead{gap:.75rem;}
+    .masthead .rule-dots{display:none;}
+    .ledger-row{grid-template-columns:1fr;gap:.35rem;padding:1.05rem .25rem;}
+    .ledger-row.head{display:none;}
+    .ledger-row .ans::before{
+      content:attr(data-l) " ";
+      color:var(--ink-faint);
+      letter-spacing:.16em;
+      font-size:.6rem;
+    }
+    .pullquote blockquote{max-width:none;}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms!important;transition-duration:.01ms!important;}
+    .rv{opacity:1;transform:none;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===== MASTHEAD ===== -->
+  <div class="shell">
+    <div class="masthead">
+      <span class="mono">The Purpose Papers · Vol. 01</span>
+      <span class="rule-dots"></span>
+      <span class="mono">On Machines, Minds &amp; Utility</span>
+      <span class="rule-dots"></span>
+      <span class="mono">An Essay for Everyone</span>
+    </div>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <div class="shell">
+    <header class="hero">
+      <div>
+        <span class="mono kicker">A question worth answering properly</span>
+        <h1 class="hero-title">
+          Tools don't<br>
+          need <span class="accent">souls.</span>
+          <span class="thin">So what exactly is AI <em>for</em>, if today's language models aren't intelligent?</span>
+        </h1>
+      </div>
+
+      <aside class="hero-aside">
+        <p><span class="drop">T</span>he argument goes like this: large language models are not truly intelligent — they are only very good pattern machines, trained on the residue of human knowledge. Therefore, some say, there is nothing new here.</p>
+        <p>It is a fair observation. It is also the wrong conclusion.</p>
+        <p>This page is a walk through why. No hype, no doom — just what a tool is, what it changes, and what becomes possible when the cost of a first draft approaches zero.</p>
+        <div class="mono sig">Reading time · 6 minutes · Written for humans</div>
+      </aside>
+    </header>
+  </div>
+
+  <!-- ===== TICKER ===== -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>Compression &amp; Access</span><span>Augmentation</span><span>Automation of the Mundane</span><span>A New Interface to Computation</span><span>Scientific Acceleration</span>
+      <span>Compression &amp; Access</span><span>Augmentation</span><span>Automation of the Mundane</span><span>A New Interface to Computation</span><span>Scientific Acceleration</span>
+    </div>
+  </div>
+
+  <!-- ===== ESSAY ===== -->
+  <div class="shell">
+    <div class="essay">
+
+      <!-- 01 -->
+      <div class="marginalia">
+        <div class="sticky">
+          <span class="num">01</span>
+          <span class="lbl">The<br>Premise</span>
+        </div>
+      </div>
+
+      <article class="col-main section">
+        <h2 class="sec-title rv">Intelligence isn't a <span class="accent">switch.</span></h2>
+        <p class="lede rv d1">People argue about whether machines are "intelligent" as if the word had a single, settled meaning. It doesn't. Intelligence is not a lamp that turns on. It is a cluster of capabilities — generalisation, abstraction, transfer, reasoning, planning, memory.</p>
+        <p class="rv d2 dropcap">Language models are weak or absent on several of these. They don't hold a stable world model. They drift over long horizons. They can't reliably tell when they are wrong. Anyone claiming otherwise is selling something.</p>
+        <p class="rv d3">But calling them <em>only</em> retrieval systems is equally wrong. They compose text that has never existed, write working code that wasn't in any training example, and move an idea from one domain into another. Whether you choose to call that "intelligence" is a definitional argument, and one that is genuinely unresolved.</p>
+        <p class="rv d4">So instead of arguing about the label, let's do something more useful. <strong>Let's grant the sceptic's premise entirely</strong> — suppose these systems really are just very good pattern machines over human knowledge. What follows? The answer is: almost nothing bad. Because the purpose of a technology never depended on the argument in the first place.</p>
+      </article>
+
+      <aside class="col-side">
+        <div class="note"><b>Note</b>A calculator performs no arithmetic "understanding." It is exact, instant, and unthinking. Nobody has ever refused to use one on those grounds.</div>
+        <div class="note"><b>Definition</b>Pattern machine · a system that predicts structure from structure, without a private model of the world.</div>
+        <div class="note"><b>Question</b>Does a printing press understand literature?</div>
+      </aside>
+
+      <!-- 02 -->
+      <div class="marginalia">
+        <div class="sticky">
+          <span class="num">02</span>
+          <span class="lbl">The Oldest<br>Confusion</span>
+        </div>
+      </div>
+
+      <article class="col-main section">
+        <h2 class="sec-title rv">Purpose does not require <span class="accent">intelligence.</span></h2>
+        <p class="lede rv d1">We have made this exact mistake before. Every generation meets a machine that thinks less than a human and changes the world more than most of them.</p>
+
+        <div class="ledger rv d2">
+          <div class="ledger-row head">
+            <span class="mono">Instrument</span>
+            <span class="mono">Intelligent?</span>
+            <span class="mono">Changed the world?</span>
+          </div>
+          <div class="ledger-row">
+            <span class="obj">The calculator</span>
+            <span class="ans no" data-l="Intelligent?">No</span>
+            <span class="ans yes" data-l="Changed?">Yes</span>
+          </div>
+          <div class="ledger-row">
+            <span class="obj">The printing press</span>
+            <span class="ans no" data-l="Intelligent?">No</span>
+            <span class="ans yes" data-l="Changed?">Yes</span>
+          </div>
+          <div class="ledger-row">
+            <span class="obj">The search engine</span>
+            <span class="ans no" data-l="Intelligent?">No</span>
+            <span class="ans yes" data-l="Changed?">Yes</span>
+          </div>
+          <div class="ledger-row">
+            <span class="obj">The language model</span>
+            <span class="ans maybe" data-l="Intelligent?">Debatable</span>
+            <span class="ans yes" data-l="Changed?">Underway</span>
+          </div>
+          <span class="ledger-note">The middle column is an argument. The third column is history.</span>
+        </div>
+
+        <p class="rv d3">The press didn't understand the books it printed, and that is precisely why it mattered: it made the expensive cheap and the rare ordinary. That is the whole story of useful technology, told in one sentence.</p>
+        <p class="rv d4">A tool's purpose is set by <strong>what it enables</strong>, never by whether it resembles a mind. Confusing the two is how people talk themselves out of noticing a shift they are already standing inside.</p>
+      </article>
+
+      <aside class="col-side">
+        <div class="note"><b>1440</b>Gutenberg's press. Zero comprehension of the text. Consequence: the Reformation, modern science, mass literacy.</div>
+        <div class="note"><b>Axle</b>The question is never "does it think?" It is "what is now cheaper than it was yesterday?"</div>
+        <div class="note"><b>Warning</b>An argument about labels is often a way of avoiding an argument about consequences.</div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ===== PULL QUOTE ===== -->
+  <div class="shell">
+    <div class="pullquote rv">
+      <blockquote>Tools don't need souls to be <em>transformative.</em></blockquote>
+      <cite>— The central claim of this essay</cite>
+    </div>
+  </div>
+
+  <!-- ===== FIVE PURPOSES ===== -->
+  <div class="shell">
+    <div class="essay">
+      <div class="marginalia">
+        <div class="sticky">
+          <span class="num">03</span>
+          <span class="lbl">Five<br>Purposes</span>
+        </div>
+      </div>
+
+      <article class="col-main section" style="max-width:none;">
+        <h2 class="sec-title rv">What AI is <span class="accent">for.</span></h2>
+        <p class="lede rv d1" style="max-width:60ch;">Grant the premise — "it's just pattern-matching over human knowledge" — and five things follow anyway. Each of them would be enough on its own.</p>
+
+        <div class="purposes">
+          <div class="purpose rv">
+            <span class="idx">i</span>
+            <h3>Compression &amp; access</h3>
+            <p>The world's knowledge has been flattened into something you can interrogate in plain language — across languages, across fields, at any hour. Whatever else happens, expertise is no longer gated behind a decade of study or a particular accent.</p>
+          </div>
+          <div class="purpose rv">
+            <span class="idx">ii</span>
+            <h3>Augmentation</h3>
+            <p>The value was never "the machine replaces the person." It's "the person with the machine outperforms the person without." Drafting, coding, analysis, translation: leverage, not substitution. Two people, very different outputs.</p>
+          </div>
+          <div class="purpose rv">
+            <span class="idx">iii</span>
+            <h3>Automation of the mundane</h3>
+            <p>The boring middle of knowledge work — reports, boilerplate code, data wrangling, triage — gets cheap. Attention is finite. Every hour not spent on the routine is spent on judgement, which is the part that genuinely needed a human.</p>
+          </div>
+          <div class="purpose rv">
+            <span class="idx">iv</span>
+            <h3>A new interface to computation</h3>
+            <p>For the first time, you don't need a programming language or a query syntax to make machines do things. Language becomes the API. That is a structural change to who gets to use computers, and it matters more than any single model.</p>
+          </div>
+          <div class="purpose rv">
+            <span class="idx">v</span>
+            <h3>Scientific &amp; engineering acceleration</h3>
+            <p>Protein work, materials discovery, conjecture exploration, code verification. Even imperfect reasoning becomes valuable when it is fast, tireless, and nearly free — because it lets the human spend their reasoning where it counts.</p>
+          </div>
+        </div>
+      </article>
+
+      <aside class="col-side">
+        <div class="note"><b>i</b>The librarian who has read every book and speaks your language.</div>
+        <div class="note"><b>ii</b>The power saw did not replace the carpenter. It changed which houses got built.</div>
+        <div class="note"><b>iii</b>Cost of a competent first draft: falling toward zero.</div>
+        <div class="note"><b>iv</b>For most of history, literacy was the interface to knowledge. Now the interface widens again.</div>
+        <div class="note"><b>v</b>Cheap, fast, imperfect — an underrated combination in research.</div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ===== 04 CAVEAT ===== -->
+  <div class="shell">
+    <div class="essay">
+      <div class="marginalia">
+        <div class="sticky">
+          <span class="num">04</span>
+          <span class="lbl">The Honest<br>Caveat</span>
+        </div>
+      </div>
+
+      <article class="col-main section">
+        <h2 class="sec-title rv">Don't <span class="accent">anthropomorphise.</span> Don't dismiss, either.</h2>
+        <p class="lede rv d1">You are right to be suspicious of the personification. These systems don't want anything, don't understand anything, and don't care whether they help you. They are extraordinarily capable, and entirely without interior.</p>
+        <p class="rv d2 dropcap">The mistake is not saying "language models aren't intelligent like humans." That's a fair description. The mistake is the leap that usually follows: <em>"therefore this is uninteresting, or unreal, or a fad."</em></p>
+        <p class="rv d3">That leap is how a person ends up watching a genuine structural change from a safe distance, still debating whether the machine has earned a particular word. The debate about the label is comfortable. The debate about the consequences is the one that matters.</p>
+        <p class="rv d4"><strong>Hold both things at once:</strong> these are tools without minds, and they are among the most consequential tools in a generation. There is no contradiction in that sentence.</p>
+      </article>
+
+      <aside class="col-side">
+        <div class="note"><b>Both/and</b>A tool without a mind. A tool with enormous consequence. These are not in conflict.</div>
+        <div class="note"><b>Trap</b>"Is it really intelligent?" can be a way of never asking "what does it change?"</div>
+        <div class="note"><b>Field note</b>Reliability, grounding, and usefulness are the real engineering problems — not impressiveness.</div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ===== CLOSING ===== -->
+  <section class="closing">
+    <div class="shell">
+      <div class="rv">
+        <span class="mono kicker" style="margin-bottom:1.75rem;">The real question</span>
+        <h2 class="q">When the cost of a competent first draft of anything approaches <span class="accent">zero</span> — what becomes possible?</h2>
+      </div>
+      <div class="answer rv d2">
+        <p>Not "is the machine intelligent?" That question has no settled answer and, honestly, no urgency.</p>
+        <p>The purpose of AI lives here instead: in what happens when the first draft of a legal letter, a lesson plan, a diagnosis, a piece of software, or a business plan becomes nearly free. Who gets to try things. Who gets to start. How much of a life gets spent on the routine, and how much on the work only a person can do.</p>
+        <p>That's the shift we're living through. And the purpose of AI is already embedded in it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="shell">
+      <div>
+        <div class="brand">Tools don't need <span class="accent">souls.</span></div>
+        <div class="mono" style="margin-top:.85rem;">An essay on the purpose of artificial intelligence · End</div>
+      </div>
+      <div class="mono">
+        Set in Fraunces &amp; Newsreader<br>
+        Written by MiMo · Xiaomi LLM Core Team<br>
+        Share it with someone who asks what it's all for
+      </div>
+    </div>
+  </footer>
+
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.12, rootMargin:'0px 0px -8% 0px'});
+
+  document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

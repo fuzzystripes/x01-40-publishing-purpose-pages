@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Library That Learned to Speak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Layout idea: a card-catalog drawer. The story is told on the dark drawer; under each chapter sits an index card holding the idea underneath. */
+  --drawer: #1e2d33;
+  --drawer-deep: #16232813;
+  --story: #e6e2d6;
+  --story-soft: #a9b3b0;
+  --card: #f3f1ea;
+  --ink: #1c2225;
+  --ink-soft: #545e61;
+  --rule-blue: #c3d3e0;
+  --rule-red: #b4463a;
+  --brass: #c9a352;
+  --display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --body: "Literata", "Iowan Old Style", Georgia, serif;
+  --mono: "Courier Prime", "Courier New", ui-monospace, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background:
+    radial-gradient(ellipse at 50% -10%, #2b3f46 0%, transparent 60%),
+    var(--drawer);
+  color: var(--story);
+  font-family: var(--body);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 5.5rem;
+  padding: 4rem 20px 6rem;
+}
+.wrap { width: 100%; max-width: 46rem; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: var(--brass); }
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+
+/* ---------- Index card ---------- */
+.card {
+  position: relative;
+  background-color: var(--card);
+  background-image:
+    linear-gradient(var(--rule-red), var(--rule-red)),
+    repeating-linear-gradient(to bottom, transparent 0, transparent calc(1.7rem - 1px), var(--rule-blue) calc(1.7rem - 1px), var(--rule-blue) 1.7rem);
+  background-size: 100% 2px, 100% 100%;
+  background-position: 0 3.4rem, 0 3.4rem;
+  background-repeat: no-repeat, repeat-y;
+  color: var(--ink);
+  border-radius: 3px;
+  padding: 1.1rem 1.6rem 2.6rem;
+  box-shadow: 0 1px 0 rgba(255,255,255,.4) inset, 0 18px 40px -18px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.25);
+}
+.card::after { /* the rod hole every catalog card has */
+  content: "";
+  position: absolute;
+  left: 50%; bottom: .8rem;
+  width: 14px; height: 14px; margin-left: -7px;
+  border-radius: 50%;
+  background: var(--drawer);
+  box-shadow: inset 0 2px 3px rgba(0,0,0,.5);
+}
+.callno {
+  font-family: var(--mono);
+  font-size: .85rem;
+  letter-spacing: .02em;
+  color: var(--ink-soft);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  min-height: 2.3rem;
+}
+.card h3 {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.7rem;
+  margin-top: .1rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.card p {
+  font-family: var(--mono);
+  font-size: 1rem;
+  line-height: 1.7rem;
+  max-width: 62ch;
+}
+.card p + p { margin-top: 1.7rem; }
+
+/* ---------- Hero ---------- */
+.hero { display: flex; flex-direction: column; gap: 1.5rem; }
+.hero .card { padding: 1.1rem 2rem 3.2rem; }
+.hero h1 {
+  font-size: clamp(2.8rem, 8vw, 5.2rem);
+  line-height: .98;
+  letter-spacing: -.01em;
+  color: var(--ink);
+  margin: 1.2rem 0 .6rem;
+}
+.hero h1 em { font-style: italic; color: var(--rule-red); }
+.hero .sub {
+  font-family: var(--body);
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.7rem;
+  color: var(--ink-soft);
+  margin-bottom: 1.7rem;
+}
+.meta { font-family: var(--mono); font-size: .95rem; line-height: 1.7rem; display: grid; grid-template-columns: 7.5rem 1fr; column-gap: 1rem; }
+.meta dt { color: var(--ink-soft); }
+.meta dd { margin: 0; }
+.howto { color: var(--story-soft); font-size: 1rem; text-align: center; font-style: italic; }
+
+/* ---------- Chapters ---------- */
+.chapter { display: flex; flex-direction: column; gap: 2rem; }
+.chapter-head { display: flex; align-items: baseline; gap: 1.1rem; border-bottom: 1px solid rgba(201,163,82,.35); padding-bottom: .9rem; }
+.numeral { font-family: var(--display); font-size: 3.6rem; line-height: 1; color: var(--brass); min-width: 3.2rem; }
+.chapter h2 { font-size: clamp(2rem, 5vw, 2.7rem); line-height: 1.05; }
+.story { display: flex; flex-direction: column; gap: 1.15rem; max-width: 65ch; }
+.story .beat { font-family: var(--display); font-style: italic; font-size: 1.7rem; line-height: 1.3; color: #f4efe0; }
+.underneath-label {
+  font-family: var(--mono);
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--brass);
+  margin-bottom: -1.2rem;
+}
+
+/* ---------- Goalposts ---------- */
+.goalposts { list-style: none; margin: .5rem 0 0; padding: 0; border-top: 1px solid rgba(230,226,214,.18); }
+.goalposts li {
+  display: grid;
+  grid-template-columns: 4.2rem 1fr;
+  gap: .2rem 1rem;
+  padding: .75rem 0;
+  border-bottom: 1px solid rgba(230,226,214,.18);
+}
+.goalposts .yr { font-family: var(--mono); color: var(--brass); font-variant-numeric: tabular-nums; }
+.goalposts .claim { color: var(--story-soft); text-decoration: line-through; text-decoration-color: var(--rule-red); text-decoration-thickness: 2px; }
+.goalposts .done { grid-column: 2; font-size: .95rem; color: var(--story); }
+.goalposts li.next .claim { text-decoration: none; color: #f4efe0; font-style: italic; }
+.caret { display: inline-block; width: .55ch; height: 1.1em; background: var(--brass); vertical-align: -.15em; margin-left: .15ch; animation: blink 1.1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ---------- Loop ---------- */
+.loop-figure { margin: .5rem 0 0; display: flex; flex-direction: column; align-items: center; gap: .8rem; }
+.loop-figure svg { width: 100%; max-width: 30rem; height: auto; overflow: visible; }
+.loop-figure figcaption { font-size: .95rem; color: var(--story-soft); font-style: italic; text-align: center; max-width: 52ch; }
+.node-label { font-family: var(--mono); font-size: 13px; fill: var(--ink); font-weight: 700; letter-spacing: .04em; }
+.node-sub { font-family: var(--body); font-style: italic; font-size: 12.5px; fill: var(--ink-soft); }
+.center-label { font-family: var(--display); font-style: italic; font-size: 24px; fill: #f4efe0; }
+.center-sub { font-family: var(--mono); font-size: 11px; fill: var(--story-soft); letter-spacing: .12em; }
+
+/* ---------- Moral ---------- */
+.moral .card { padding: 1.1rem 2rem 3.4rem; }
+.moral .card p.big {
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 4vw, 2.15rem);
+  line-height: 3.4rem;
+  max-width: none;
+}
+.card p.sor { color: var(--ink-soft); }
+.card p.sor b { color: var(--rule-red); font-weight: 700; }
+.oneline { text-align: center; display: flex; flex-direction: column; gap: .6rem; }
+.oneline .k { font-family: var(--mono); font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--brass); }
+.oneline p { font-family: var(--display); font-size: clamp(1.7rem, 4.6vw, 2.5rem); line-height: 1.2; color: #f4efe0; text-wrap: balance; }
+footer { text-align: center; font-family: var(--mono); font-size: .8rem; color: var(--story-soft); padding-bottom: 2rem; }
+
+@media (max-width: 520px) {
+  body { font-size: 1.05rem; }
+  .card, .hero .card, .moral .card { padding-left: 1.1rem; padding-right: 1.1rem; }
+  .meta { grid-template-columns: 1fr; }
+  .meta dt { margin-top: .4rem; }
+  .numeral { font-size: 2.8rem; min-width: 2.4rem; }
+  .moral .card p.big { line-height: 2.55rem; font-size: 1.45rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .caret { animation: none; }
+  .orbit { display: none; }
+}
+</style>
+</head>
+<body>
+<main>
+
+  <!-- HERO -->
+  <header class="wrap hero">
+    <article class="card" aria-labelledby="title">
+      <div class="callno"><span>AI 001 .L53 2026</span><span>Parable · 9 chapters</span></div>
+      <h1 id="title">The Library That Learned to <em>Speak</em></h1>
+      <p class="sub">A parable about what AI is for, if today's AI isn't truly intelligent.</p>
+      <dl class="meta">
+        <dt>Subjects</dt><dd>1. Knowledge. 2. Intelligence (disputed). 3. Judgment.</dd>
+        <dt>Contents</dt><dd>A town, a library, a quarrel, a workshop, a war.</dd>
+        <dt>Thesis</dt><dd>Today's AI is intel. Intelligence is the loop. Command stays human.</dd>
+      </dl>
+    </article>
+    <p class="howto">Read the story on top. Each chapter ends with an index card that names the idea underneath.</p>
+  </header>
+
+  <!-- I -->
+  <section class="wrap chapter" aria-labelledby="c1">
+    <div class="chapter-head"><span class="numeral">I</span><h2 id="c1">The Silent Library</h2></div>
+    <div class="story">
+      <p>In a town at the bend of a river stood a library that held almost everything anyone had ever written down: how to set a bone, how to read a contract, how to keep a bridge standing when the river rose.</p>
+      <p class="beat">And almost nobody used it.</p>
+      <p>The books were all there. The hard part was getting from the book to the problem. A farmer with sick goats didn't know which shelf, which volume, which page, or how that page applied to <em>his</em> goats on <em>this</em> Tuesday.</p>
+      <p>So the town relied on a handful of people who had spent decades learning to make that trip: the physician, the lawyer, the engineer. They were wise, busy and expensive. Most questions in town simply went unasked.</p>
+    </div>
+    <p class="underneath-label">The idea underneath</p>
+    <article class="card">
+      <div class="callno"><span>AI 001.1</span><span>Scarcity</span></div>
+      <h3>The bottleneck was never the books</h3>
+      <p>Knowledge has rarely been the scarce thing. Applying it to one specific situation has. For most of history that step ran through human experts, so competence was costly, slow and unevenly spread.</p>
+    </article>
+  </section>
+
+  <!-- II -->
+  <section class="wrap chapter" aria-labelledby="c2">
+    <div class="chapter-head"><span class="numeral">II</span><h2 id="c2">The Press</h2></div>
+    <div class="story">
+      <p>One year a machine arrived that could copy books faster than a hundred scribes. Soon every house had a shelf of its own. The town grew more literate, more argumentative, more alive.</p>
+      <p>But the farmer still stood in front of his shelf with sick goats, no idea which page mattered, and a long walk to the physician.</p>
+    </div>
+    <p class="underneath-label">The idea underneath</p>
+    <article class="card">
+      <div class="callno"><span>AI 001.2</span><span>Copy vs. apply</span></div>
+      <h3>Cheap to copy, still costly to use</h3>
+      <p>The printing press made knowledge cheap to copy. It did nothing to make knowledge cheap to apply. That second gap stayed open for centuries.</p>
+    </article>
+  </section>
+
+  <!-- III -->
+  <section class="wrap chapter" aria-labelledby="c3">
+    <div class="chapter-head"><span class="numeral">III</span><h2 id="c3">The Library Speaks</h2></div>
+    <div class="story">
+      <p class="beat">Then, one spring, the library began to talk.</p>
+      <p>You could walk in, describe your goats in plain words, and the library would answer: what the symptoms suggested, what to try first, when to stop trying and call the physician.</p>
+      <p>The baker asked how to price her bread. The young engineer asked why his model bridge wobbled. A widow asked what the letter from the bank actually meant. The library answered all of them at once, at midnight, for almost nothing.</p>
+      <p>Some people were frightened. Some were delighted. The scholars gathered to decide what, exactly, had happened.</p>
+    </div>
+    <p class="underneath-label">The idea underneath</p>
+    <article class="card">
+      <div class="callno"><span>AI 001.3</span><span>Executable knowledge</span></div>
+      <h3>The cost of competence collapses</h3>
+      <p>Large language models compress a vast amount of written knowledge and apply it to whatever question is in front of them. Whether or not that counts as intelligence, the price of expert-level help falls toward zero.</p>
+      <p>Most useful work in the world is exactly this: known knowledge, applied to a particular case.</p>
+    </article>
+  </section>
+
+  <!-- IV -->
+  <section class="wrap chapter" aria-labelledby="c4">
+    <div class="chapter-head"><span class="numeral">IV</span><h2 id="c4">The Shelves Rearrange</h2></div>
+    <div class="story">
+      <p>Odd things started to happen. A beekeeper asked about swarms, and the library answered with a trick from traffic engineering. A weaver asked about patterns and got an idea borrowed from music theory.</p>
+      <p>Nobody in town had read both shelves. The library had read all of them, and it could not help noticing when two distant books were quietly describing the same thing.</p>
+    </div>
+    <p class="underneath-label">The idea underneath</p>
+    <article class="card">
+      <div class="callno"><span>AI 001.4</span><span>Recombination</span></div>
+      <h3>New to everyone who sees it</h3>
+      <p>Much of what gets called innovation is moving an idea from one field into another. Experts live in silos. A model trained across all of them can bridge gaps no single person spans, so "just automated knowledge" can still produce something genuinely new to every human who reads it.</p>
+    </article>
+  </section>
+
+  <!-- V -->
+  <section class="wrap chapter" aria-labelledby="c5">
+    <div class="chapter-head"><span class="numeral">V</span><h2 id="c5">The Common Tongue</h2></div>
+    <div class="story">
+      <p>The library spoke the way you spoke. To the lawyer it spoke contracts. To the farmer it spoke goats. And, most surprisingly, to the town's machines it spoke instructions.</p>
+      <p>The mill, the ledger and the lock on the granary door could all now be asked for things in plain words, by anyone, without learning the machine's private language first.</p>
+    </div>
+    <p class="underneath-label">The idea underneath</p>
+    <article class="card">
+      <div class="callno"><span>AI 001.5</span><span>Interface</span></div>
+      <h3>Language becomes the universal API</h3>
+      <p>Natural language turns into an interface between people and software, and between experts who use different vocabularies for the same ideas. That translation layer is valuable whether or not anything behind it thinks.</p>
+    </article>
+  </section>
+
+  <!-- VI -->
+  <section class="wrap chapter" aria-labelledby="c6">
+    <div class="chapter-head"><span class="numeral">VI</span><h2 id="c6">The Philosophers' Quarrel</h2></div>
+    <div class="story">
+      <p>The scholars argued for years about whether the library was truly intelligent. The eldest had a rule she repeated often: real intelligence would be able to do <em>one particular thing</em>. Each time the library did that thing, she named a new one.</p>
+      <ol class="goalposts" aria-label="Each time the line was crossed, it moved">
+        <li><span class="yr">1997</span><span class="claim">"Real intelligence would beat a grandmaster at chess."</span><span class="done">Deep Blue beats Kasparov.</span></li>
+        <li><span class="yr">2011</span><span class="claim">"Real intelligence would understand riddles and wordplay."</span><span class="done">Watson wins at Jeopardy!</span></li>
+        <li><span class="yr">2016</span><span class="claim">"Real intelligence would master Go. Go needs intuition."</span><span class="done">AlphaGo beats Lee Sedol.</span></li>
+        <li><span class="yr">2022</span><span class="claim">"Real intelligence would write a fluent essay."</span><span class="done">Chatbots write essays on demand.</span></li>
+        <li><span class="yr">2025</span><span class="claim">"Real intelligence would solve olympiad mathematics."</span><span class="done">AI systems reach gold-medal level at the International Mathematical Olympiad.</span></li>
+        <li class="next"><span class="yr">Next</span><span class="claim">"Real intelligence would…<span class="caret" aria-hidden="true"></span>"</span></li>
+      </ol>
+    </div>
+    <p class="underneath-label">The idea underneath</p>
+    <article class="card">
+      <div class="callno"><span>AI 001.6</span><span>The moving line</span></div>
+      <h3>Name the missing pieces instead</h3>
+      <p>An old quip in computing says intelligence is whatever machines haven't done yet. If "intelligent" means "what machines can't do," then "AI isn't intelligent" stays true forever and tells us nothing.</p>
+      <p>The sharper move is to name what is actually missing: goals of its own, grounding in real consequences, reliability on the unfamiliar, and long plans that notice and fix their own mistakes.</p>
+    </article>
+  </section>
+
+  <!-- VII -->
+  <section class="wrap chapter" aria-labelledby="c7">
+    <div class="chapter-head"><span class="numeral">VII</span><h2 id="c7">The Confident Error</h2></div>
+    <div class="story">
+      <p>One foggy night a ferry captain asked the library when the tide would turn. The library answered in the same calm, kind voice it always used.</p>
+      <p class="beat">It was wrong.</p>
+      <p>The ferry slid onto a sandbar. Nobody was hurt, but the town learned something it should have guessed: the library sounded exactly as sure when it was wrong as when it was right. From then on, sensible captains checked the tide post too.</p>
+    </div>
+    <p class="underneath-label">The idea underneath</p>
+    <article class="card">
+      <div class="callno"><span>AI 001.7</span><span>Verification</span></div>
+      <h3>Fluency without accountability</h3>
+      <p>The real hazard is confidence that stays constant whether the answer is right or wrong. Generating answers is now the cheap part. Checking them, against sources, tests and the real world, is where the hard engineering lives.</p>
+    </article>
+  </section>
+
+  <!-- VIII -->
+  <section class="wrap chapter" aria-labelledby="c8">
+    <div class="chapter-head"><span class="numeral">VIII</span><h2 id="c8">The Workshop by the River</h2></div>
+    <div class="story">
+      <p>After the ferry, the young engineer built a workshop beside the library. The library proposed bridge designs. The workshop built small models and tested them in the real river. Whatever failed went back to the library with notes on how it failed.</p>
+      <p>Round after round, all through the winter. One morning the workshop produced a truss that no book in the library described.</p>
+      <p class="beat">The library hadn't thought of it. The workshop hadn't either. The loop had.</p>
+      <figure class="loop-figure">
+        <svg viewBox="0 0 440 400" role="img" aria-labelledby="loopTitle loopDesc">
+          <title id="loopTitle">The discovery loop</title>
+          <desc id="loopDesc">Three steps in a cycle: the library proposes, the river tests, the checker selects, and the results feed back into new proposals.</desc>
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#c9a352"/>
+            </marker>
+          </defs>
+          <circle cx="220" cy="205" r="130" fill="none" stroke="rgba(201,163,82,.25)" stroke-width="1.5" stroke-dasharray="3 6"/>
+          <!-- arcs between nodes -->
+          <path d="M 300 110 A 130 130 0 0 1 340 260" fill="none" stroke="#c9a352" stroke-width="2" marker-end="url(#arrow)"/>
+          <path d="M 270 325 A 130 130 0 0 1 150 315" fill="none" stroke="#c9a352" stroke-width="2" marker-end="url(#arrow)"/>
+          <path d="M 98 245 A 130 130 0 0 1 150 100" fill="none" stroke="#c9a352" stroke-width="2" marker-end="url(#arrow)"/>
+          <path id="orbitPath" d="M 220 75 A 130 130 0 1 1 219.9 75" fill="none" stroke="none"/>
+          <circle class="orbit" r="5" fill="#f4efe0">
+            <animateMotion dur="7s" repeatCount="indefinite"><mpath href="#orbitPath"/></animateMotion>
+          </circle>
+          <!-- nodes -->
+          <g transform="translate(220,75)">
+            <rect x="-78" y="-34" width="156" height="68" rx="3" fill="#f3f1ea"/>
+            <rect x="-78" y="-34" width="156" height="3" fill="#b4463a"/>
+            <text class="node-label" text-anchor="middle" y="-4">PROPOSE</text>
+            <text class="node-sub" text-anchor="middle" y="17">the library</text>
+          </g>
+          <g transform="translate(345,290)">
+            <rect x="-78" y="-34" width="156" height="68" rx="3" fill="#f3f1ea"/>
+            <rect x="-78" y="-34" width="156" height="3" fill="#b4463a"/>
+            <text class="node-label" text-anchor="middle" y="-4">TEST</text>
+            <text class="node-sub" text-anchor="middle" y="17">the real river</text>
+          </g>
+          <g transform="translate(95,290)">
+            <rect x="-78" y="-34" width="156" height="68" rx="3" fill="#f3f1ea"/>
+            <rect x="-78" y="-34" width="156" height="3" fill="#b4463a"/>
+            <text class="node-label" text-anchor="middle" y="-4">SELECT</text>
+            <text class="node-sub" text-anchor="middle" y="17">the checker</text>
+          </g>
+          <text class="center-label" text-anchor="middle" x="220" y="205">discovery</text>
+          <text class="center-sub" text-anchor="middle" x="220" y="228">LIVES IN THE LOOP</text>
+        </svg>
+        <figcaption>None of the three parts invents the truss alone. Propose, test against reality, keep what survives, repeat.</figcaption>
+      </figure>
+    </div>
+    <p class="underneath-label">The idea underneath</p>
+    <article class="card">
+      <div class="callno"><span>AI 001.8</span><span>Systems</span></div>
+      <h3>Intelligence as a property of the system</h3>
+      <p>Put a model in a loop with tools, a verifier and real feedback, and the system can find things that aren't in its training data. Systems pairing language models with automated evaluators have already discovered new algorithms this way.</p>
+      <p>"Is the model intelligent?" may be the wrong unit of analysis. Ask what the whole loop can do.</p>
+    </article>
+  </section>
+
+  <!-- IX -->
+  <section class="wrap chapter" aria-labelledby="c9">
+    <div class="chapter-head"><span class="numeral">IX</span><h2 id="c9">The General's Tent</h2></div>
+    <div class="story">
+      <p>Eventually trouble came up the river, as it tends to in parables. Both sides had libraries now. Both generals received more intel than any army in history: every road, every ford, every rumor, delivered instantly and fluently.</p>
+      <p>The general who won did not have more intel. She knew which question mattered, which report to doubt, and when to stop reading and move.</p>
+    </div>
+    <p class="underneath-label">The idea underneath</p>
+    <article class="card">
+      <div class="callno"><span>AI 001.9</span><span>Command</span></div>
+      <h3>Intel needs a commander</h3>
+      <p>In military language, intel is information that only becomes valuable when someone acts on it. When knowledge is abundant, the scarce things are goals, taste, judgment and accountability.</p>
+      <p>The purpose of AI, then, is to turn experts from retrieval clerks into editors and commanders: people freed to decide what's worth doing, and to own what happens next.</p>
+    </article>
+  </section>
+
+  <!-- MORAL -->
+  <section class="wrap moral" aria-labelledby="moral">
+    <article class="card">
+      <div class="callno"><span id="moral">MORAL</span><span>Filed under: everyone</span></div>
+      <p class="big">The library never had to think to change the town. It only had to speak. After that, the town needed people who knew what to ask, what to check, and what to do next.</p>
+      <p class="sor">/ <b>Intel:</b> Claude, a language model made by Anthropic ; <b>Command:</b> miLord.</p>
+    </article>
+  </section>
+
+  <section class="wrap oneline" aria-label="The idea in one line">
+    <span class="k">The idea in one line</span>
+    <p>Today's AI is intel. Intelligence is the loop it sits in. The command is still ours.</p>
+  </section>
+
+</main>
+<footer>AI 001 .L53 2026 · Intel: Claude. Command: miLord. · Return when finished thinking.</footer>
+</body>
+</html>

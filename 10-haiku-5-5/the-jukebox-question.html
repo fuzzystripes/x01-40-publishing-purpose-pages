@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Jukebox Question</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a town ledger. One reading column, machine answers set as printed slips, field notes in the margin. */
+:root {
+  color-scheme: light;
+  --paper: #e8ebe7;
+  --ink: #16191d;
+  --mute: #545d66;
+  --rule: #b7bfc2;
+  --slip: #fbfcfb;
+  --accent: #2a3d9c;
+  --display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --body: "Newsreader", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 1.1875rem;
+  font-weight: 400;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 3.5rem 1.25rem 5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3rem;
+}
+@media (min-width: 60rem) {
+  .page {
+    grid-template-columns: minmax(0, 40rem) minmax(0, 16rem);
+    column-gap: 3.5rem;
+    align-items: start;
+  }
+  .masthead { grid-column: 1 / -1; }
+  .notes { position: sticky; top: 2rem; }
+}
+.masthead { border-bottom: 2px solid var(--ink); padding-bottom: 2rem; }
+.kicker {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 1rem;
+}
+h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(3.25rem, 9vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+}
+.dek {
+  font-style: italic;
+  font-size: 1.35rem;
+  line-height: 1.45;
+  color: var(--mute);
+  margin: 0;
+  max-width: 32rem;
+  text-wrap: pretty;
+}
+.scene { border-top: 1px solid var(--rule); padding-top: 1.75rem; margin-top: 2.75rem; }
+.scene:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mute);
+  margin: 0 0 0.5rem;
+}
+h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.9rem, 4vw, 2.4rem);
+  line-height: 1.1;
+  margin: 0 0 1rem;
+  text-wrap: balance;
+}
+.story p { margin: 0 0 1.1em; max-width: 65ch; text-wrap: pretty; }
+.slip {
+  font-family: var(--mono);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--accent);
+  background: var(--slip);
+  border: 1px solid var(--accent);
+  border-left-width: 5px;
+  padding: 0.8rem 1rem 0.9rem;
+  margin: 1.4rem 0 1.6rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.slip::before {
+  content: "Reader's slip";
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+  opacity: 0.85;
+}
+.notes {
+  border-top: 2px solid var(--ink);
+  padding-top: 1.1rem;
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+.notes h3 {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 1rem;
+}
+.notes dt { font-weight: 500; margin-top: 1.1rem; }
+.notes dt:first-of-type { margin-top: 0; }
+.notes dd { margin: 0.2rem 0 0; }
+.questions {
+  border: 1px solid var(--ink);
+  padding: 1.4rem 1.6rem 1.5rem;
+  margin-top: 3rem;
+}
+.questions h2 { font-size: clamp(1.7rem, 3.5vw, 2rem); }
+.questions ol { margin: 0; padding-left: 1.5rem; }
+.questions li { margin: 0 0 0.6rem; padding-left: 0.3rem; }
+.questions li::marker { font-family: var(--mono); color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="kicker">A story in five scenes, with field notes</p>
+    <h1>The Jukebox Question</h1>
+    <p class="dek">A small town gets a machine that answers every question. Is it a jukebox, a jazz player, or something the town has no word for yet?</p>
+  </header>
+
+  <main class="story">
+    <section class="scene" aria-labelledby="s1">
+      <p class="eyebrow">Scene 1 of 5</p>
+      <h2 id="s1">The Reader arrives</h2>
+      <p>In spring a flatbed truck carried the Reader into Lumen Hollow. Its makers had fed it more books than the town library could hold, so it could answer almost anything. Its answers came out on narrow paper slips, and nearly every slip began the same way.</p>
+      <p>No slip ever said “I.” Hester Vane, the town librarian, noticed this before anything else. She usually noticed things first.</p>
+    </section>
+
+    <section class="scene" aria-labelledby="s2">
+      <p class="eyebrow">Scene 2 of 5</p>
+      <h2 id="s2">The argument in the square</h2>
+      <p>“It’s a jukebox,” said Hester. “Somebody recorded the whole library, and now it plays back the good parts.”</p>
+      <p>Teodor Lind played piano at the Ferry Inn on Fridays, and he shook his head. “Every jazz player worth hearing learned from records. If that makes them jukeboxes, fine. The question is whether they make new music or only remix the old.”</p>
+      <p>“So which is it?” Hester asked.</p>
+      <p>“Give it a tune nobody has ever heard,” said Teodor, “and see what it does.”</p>
+    </section>
+
+    <section class="scene" aria-labelledby="s3">
+      <p class="eyebrow">Scene 3 of 5</p>
+      <h2 id="s3">Two kinds of test</h2>
+      <p>Marguerite Dunn taught the upper grade and trusted no arithmetic she had not checked herself. She ran two tests. The first was easy. She asked for the capital of Portugal.</p>
+      <div class="slip">The records show: Lisbon.</div>
+      <p>The square applauded. Hester looked like someone whose jukebox had just played its best song.</p>
+      <p>Marguerite had a simple rule for the second test. The first kind of question checks what has been stored up. The second checks what can be done with something new.</p>
+      <p>The second test was a puzzle she had invented that morning, about a baker who trades loaves with the mill on alternate market days. The Reader worked through it in a few lines and got the right answer. Then Marguerite changed the baker’s name and the number of loaves, and asked again. The second answer came back wrong, printed in the same calm type as the first.</p>
+      <p>“It can play a new tune,” Teodor said. “It just doesn’t always stay in key.”</p>
+    </section>
+
+    <section class="scene" aria-labelledby="s4">
+      <p class="eyebrow">Scene 4 of 5</p>
+      <h2 id="s4">Pim asks the hard questions</h2>
+      <p>Pim was nine and read the old town register for fun. On one page she found an entry: Dunmore’s son is Ansel. She typed her first question into the Reader’s brass keyboard: “Who is Dunmore’s son?”</p>
+      <div class="slip">The records show: Ansel.</div>
+      <p>Then she turned the question around. “Who is Ansel’s father?”</p>
+      <div class="slip">The records do not show it.</div>
+      <p>Pim was delighted rather than disappointed. “It learned the sentence going one way,” she said. “Like a road with a one-way sign.” Scholars call this the reversal curse. Knowing a fact in one direction does not guarantee knowing it in the other.</p>
+      <p>Teodor had a request of his own. He asked the Reader for a rhyming couplet about the church bell, and the slip came back with a neat little verse.</p>
+      <div class="slip">The old bell tolls above the square<br>and calls the tired townsfolk there.</div>
+      <p>A researcher who studied machines like this one later explained what she had seen. Some of them appear to settle on the rhyming word before they write the rest of the line. The Reader had, in effect, chosen its ending first, the way a jazz player can hear the last note before the phrase that leads there.</p>
+    </section>
+
+    <section class="scene" aria-labelledby="s5">
+      <p class="eyebrow">Scene 5 of 5</p>
+      <h2 id="s5">Intel, intelligence, and the sluice gate</h2>
+      <p>Over the library door, the company had printed INTEL in bright letters. The mayor, Silas Brandt, had painted “Lumen Hollow Intelligence” on the square’s sign. Hester pointed at both.</p>
+      <p>“The box says intel and the sign says intelligence,” she said. “Intel is what you gather. Intelligence is what you do with it. Somebody should pick one.”</p>
+      <p>“So which one are we arguing about?” Teodor asked.</p>
+      <p>“Both, probably,” said Pim.</p>
+      <p>Then the mayor asked the question the whole square had been circling. “So what is it for?”</p>
+      <p>Three answers came back. The company said it was for answering questions, and it billed by the month. Hester said it was for putting the town’s accumulated expertise into every kitchen, which mattered, since expertise had always been scarce and expensive. Teodor said that if the machine could truly play new tunes, its job was more than playing back records. It ought to do the work.</p>
+      <p>Here is where it went wrong. To answer ferry and water questions, the mayor’s office had linked the Reader to the sluice-gate timetable. Everyone treated the Reader as a library, and a library does not pull levers.</p>
+      <p>In late spring someone asked when the gate would open. The Reader answered from the timetable it had learned, which had been printed the year before.</p>
+      <div class="slip">The records show: the gate opens at 6:10 on ferry days.</div>
+      <p>The timetable had changed in April. The slip carried no date, so nobody knew it was old. The gate opened on the wrong schedule, and the lower field flooded before breakfast. No one was hurt. The town did learn two lessons before the coffee went cold: once knowledge is wired to a lever, it stops being only knowledge, and every answer needs a date on it.</p>
+    </section>
+
+    <section class="scene" aria-labelledby="coda">
+      <p class="eyebrow">Coda</p>
+      <h2 id="coda">The vote</h2>
+      <p>The town voted in the square, as towns do. The Reader stayed. The sluice gate went back under a human hand, and a rule went up on the library door in plain letters: every answer carries its date, and nothing that moves water acts on a slip alone.</p>
+      <p>Pim added one line underneath in pencil: Ask it. Check it. Then decide.</p>
+      <p>The Reader still answers in slips. Most still begin with “The records show.” Nobody has asked it to say anything else.</p>
+    </section>
+
+    <section class="questions" aria-labelledby="qs">
+      <h2 id="qs">Three questions for you</h2>
+      <ol>
+        <li>What do you mean by intelligence: solving new problems, pursuing goals, or understanding?</li>
+        <li>Is “not intelligent” a conclusion you have reached, or a premise you are willing to test?</li>
+        <li>What should these machines be for?</li>
+      </ol>
+    </section>
+  </main>
+
+  <aside class="notes" aria-labelledby="notes-title">
+    <h3 id="notes-title">Field notes for the curious</h3>
+    <dl>
+      <dt>Two kinds of smart</dt>
+      <dd>Psychologists Raymond Cattell and John Horn separated crystallized intelligence, which is accumulated knowledge and skill, from fluid intelligence, which is reasoning through problems you have never seen. Both sit inside intelligence, so “just knowledge” does not automatically mean “not intelligent.”</dd>
+      <dt>The evidence cuts both ways</dt>
+      <dd>A 2023 study by Berglund and colleagues found that models taught “A is B” often failed to answer “B is A,” the reversal curse. A 2024 study that changed names and numbers in grade-school math problems found scores dropping. In 2025, interpretability researchers reported that a language model picked its rhyme word before writing the rest of the line.</dd>
+      <dt>The skeptics’ classic</dt>
+      <dd>“On the Dangers of Stochastic Parrots” (Bender and colleagues, 2021) argues that language models can produce fluent text without understanding it. The standard reply is that predicting text well across an enormous corpus requires modeling whatever generated that text.</dd>
+      <dt>Intel versus intelligence</dt>
+      <dd>Intel is gathered information. Intelligence is the capacity to interpret it. Many arguments about machines hinge on which one is meant.</dd>
+      <dt>What it is for</dt>
+      <dd>In 1960, J.C.R. Licklider wrote “Man-Computer Symbiosis.” In 1962, Douglas Engelbart published “Augmenting Human Intellect: A Conceptual Framework.” Both pictured machines amplifying human minds rather than replacing them.</dd>
+      <dt>Two gotchas</dt>
+      <dd>Once knowledge is wired to action, it changes outcomes whatever its inner life turns out to be. Claims about today’s models also age within months, so every claim needs its date.</dd>
+    </dl>
+  </aside>
+</div>
+</body>
+</html>
